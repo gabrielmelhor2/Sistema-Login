@@ -2,6 +2,7 @@ from bottle import route, run
 from bottle import template, request
 from bottle import static_file, get
 from bottle import error
+import os
 """ @route("/")
 @route("/user/<nome>")
 def index(nome="Desconhecido"):
@@ -52,7 +53,12 @@ def check_login(username, password):
     return False
 
 
-@route("/login", method="POST")
+@route("/")
+def index():
+    return template("login")
+
+
+@route("/", method="POST")
 def acao_login():
     username = request.forms.get("username")
     password = request.forms.get("password")
@@ -66,5 +72,7 @@ def error404(error):
 
 
 if __name__ == '__main__':
-
-    run(host="localhost", port=8080, debug=True, reloader=True)
+    if os.environ.get('APP_LOCATION') == "heroko":
+        run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    else:
+        run(host="localhost", port=8080, debug=True, reloader=True)

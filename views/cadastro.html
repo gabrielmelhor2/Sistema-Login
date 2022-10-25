@@ -1,12 +1,13 @@
-% rebase('base.html', title='Fazer login')
+% rebase('base.html', title='Fazer cadastro')
 
 <div class="panel-heading">
-  <h3 class="panel-title">Login</h3>
+  <h3 class="panel-title">Cadastro</h3>
 </div>
 <div class="panel-body">
-  <form accept-charset="UTF-8" role="form" action="/" method="post">
+  <form accept-charset="UTF-8" role="form" action="cadastro" method="post">
     <fieldset>
       <div class="form-group">
+        <p>Escolha um username:</p>
         <input
           class="form-control"
           placeholder="username"
@@ -15,6 +16,7 @@
         />
       </div>
       <div class="form-group">
+        <p>Escolha uma senha:</p>
         <input
           class="form-control"
           placeholder="password"
@@ -26,12 +28,12 @@
       <input
         class="btn btn-lg btn-success btn-block"
         type="submit"
-        value="Login"
+        value="Cadastrar"
       />
     </fieldset>
   </form>
-  <p><a href="cadastro">Clique aqui</a> para fazer o cadastro.</p>
-  % if not sucesso:
-  <p style="color: red"><strong>Usuário e/ou senha incorretos.</strong></p>
+  % if existe_username:
+  <p style="color: red"><strong>Esse username já existe!</strong></p>
   % end
+  <p><a href="/">Clique aqui</a> para fazer o login.</p>
 </div>
