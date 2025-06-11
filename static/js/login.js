@@ -1,11 +1,6 @@
-$(document).ready(function() {
-  $(document).mousemove(function(e){
-    TweenLite.to$(body),
-    .5,
-    {css:
-      {
-        backgroundPosition: "" + parseInt(event.pageX/8)
-      }
-    }
-  }
-}
+$(document).ready(function () {
+  $(document).mousemove(function (e) {
+    const offsetX = parseInt(e.pageX / 8);
+    $('body').css('background-position', `${offsetX}px 0`);
+  });
+});
