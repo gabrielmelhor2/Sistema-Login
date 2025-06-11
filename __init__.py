@@ -43,7 +43,7 @@ def fonts(filename):
 
 @route("/login")
 def login():
-    return template("login")
+    return template("login", sucesso=True)
 
 
 def check_login(username, password):
@@ -55,7 +55,7 @@ def check_login(username, password):
 
 @route("/")
 def index():
-    return template("login")
+    return template("login", sucesso=True)
 
 
 @route("/", method="POST")
@@ -63,7 +63,7 @@ def acao_login():
     username = request.forms.get("username")
     password = request.forms.get("password")
     sucesso = check_login(username, password)
-    return template("verificacao_login", sucesso=check_login(username, password))
+    return template("verificacao_login", sucesso=sucesso, name=username)
 
 
 @error(404)
