@@ -1,78 +1,71 @@
-from bottle import route, run
-from bottle import template, request
-from bottle import static_file, get
-from bottle import error
+from bottle import Bottle, template, request, static_file, redirect, run
 import os
-""" @route("/")
-@route("/user/<nome>")
-def index(nome="Desconhecido"):
-    return "<h1>Olá " + nome + " </h1>"
+
+# ----------------------------------------------------------------------
+# Instância da aplicação
+# ----------------------------------------------------------------------
+app = Bottle()
+
+# Credenciais simuladas (somente para demonstração)
+USERS = {
+    "user1": "python",
+    "user2": "java",
+    "user3": "go",
+}
 
 
-@route("/artigo/<id>")
-def artigo(id):
-    return "<h1>Você está lendo o artigo" + id + " </h1>"
+def check_login(username: str, password: str) -> bool:
+    """Verifica se usuário e senha correspondem às credenciais cadastradas."""
+    return USERS.get(username) == password
 
 
-@route("/pagina/<id>/<nome>")
-def pagina(id, nome):
-    return "<h1>Você está vendo a página " + id + " com o nome " + nome + " </h1 >" """
-
-# STATIC ROUTES
-
-
-@get('/<filename:re:.*\.css>')
-def stylesheets(filename):
-    return static_file(filename, root='static/css')
-
-
-@get('/<filename:re:.*\.js>')
-def javascripts(filename):
-    return static_file(filename, root='static/js')
-
-
-@get('/<filename:re:.*\.(jpg|png|gif|ico)>')
-def images(filename):
-    return static_file(filename, root='static/imgs')
-
-
-@get('/<filename:re:.*\.(eot|ttf|woff|svg)>')
-def fonts(filename):
-    return static_file(filename, root='static/fonts')
-
-
-@route("/login")
-def login():
+# ----------------------------------------------------------------------
+# Rotas
+# ----------------------------------------------------------------------
+@app.get("/login")
+def login_form():
+    """Exibe o formulário de login."""
     return template("login", sucesso=True)
 
 
-def check_login(username, password):
-    d = {"user1": "python", "user2": "java", "user3": "go"}
-    if username in d.keys() and d[username] == password:
-        return True
-    return False
-
-
-@route("/")
-def index():
-    return template("login", sucesso=True)
-
-
-@route("/", method="POST")
-def acao_login():
+@app.post("/login")
+def login_submit():
+    """Recebe os dados do formulário e valida o login."""
     username = request.forms.get("username")
     password = request.forms.get("password")
     sucesso = check_login(username, password)
-    return template("verificacao_login", sucesso=sucesso, name=username)
+    if sucesso:
+        return template("verificacao_login", sucesso=True, name=username)
+    return template("login", sucesso=False)
 
 
-@error(404)
-def error404(error):
+@app.get("/")
+def root():
+    """Redireciona a rota raiz para a tela de login."""
+    return redirect("/login")
+
+
+@app.get("/static/<filepath:path>")
+def server_static(filepath):
+    """Serve arquivos estáticos (CSS, JS, imagens, etc.)."""
+    return static_file(filepath, root="static")
+
+
+# ----------------------------------------------------------------------
+# Tratamento de erros
+# ----------------------------------------------------------------------
+@app.error(404)
+def error404(_):
+    """Página personalizada para erros 404."""
     return template("page404")
 
 
-if __name__ == '__main__':
-    if os.environ.get('APP_LOCATION') == "heroko":
-        run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+# ----------------------------------------------------------------------
+# Execução
+# ----------------------------------------------------------------------
+if __name__ == "__main__":
+    # Se a variável APP_LOCATION == 'heroku', lê a porta definida pela plataforma
+    if os.environ.get("APP_LOCATION") == "heroku":
+        run(app=app, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
     else:
-        run(host="localhost", port=8080, debug=True, reloader=True)
+        run(app=app, host="localhost", port=8080, debug=True, reloader=True)
